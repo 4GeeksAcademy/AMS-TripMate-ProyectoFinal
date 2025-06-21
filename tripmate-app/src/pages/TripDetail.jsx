@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import ItineraryForm from "../components/ItineraryForm";
 import ItineraryView from "../components/ItineraryView";
+import ShareButton from "../components/ShareButton";
 
 function TripDetail() {
   const { id } = useParams();
@@ -67,8 +68,8 @@ function TripDetail() {
   }
 
   return (
-    <div className="text-center mt-8">
-      <h2 className="text-2xl font-semibold text-blue-800">{trip.title}</h2>
+    <div className="w-full max-w-md mx-auto text-center mt-8 px-2">
+      <h2 className="text-2xl font-semibold text-blue-800 break-words">{trip.title}</h2>
       <p className="mt-2 text-blue-900">
         {trip.startDate} - {trip.endDate}
       </p>
@@ -81,6 +82,7 @@ function TripDetail() {
         onDelete={handleDeleteActivity}
         onEdit={handleEditActivity}
       />
+      <ShareButton url={window.location.href} />
       <Link to="/" className="text-blue-700 underline block mt-4">Volver al inicio</Link>
     </div>
   );

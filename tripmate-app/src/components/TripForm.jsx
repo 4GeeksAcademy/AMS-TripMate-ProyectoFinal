@@ -1,9 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-function TripForm({ onAddTrip }) {
+function TripForm({ onAddTrip, editTrip }) {
   const [title, setTitle] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+
+  useEffect(() => {
+    if (editTrip) {
+      setTitle(editTrip.title || "");
+      setStartDate(editTrip.startDate || "");
+      setEndDate(editTrip.endDate || "");
+    } else {
+      setTitle("");
+      setStartDate("");
+      setEndDate("");
+    }
+  }, [editTrip]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -19,7 +31,9 @@ function TripForm({ onAddTrip }) {
       onSubmit={handleSubmit}
       className="bg-white rounded shadow p-4 flex flex-col gap-2 w-full max-w-md"
     >
-      <h2 className="text-xl font-semibold text-blue-700 mb-2">Nuevo viaje</h2>
+      <h2 className="text-xl font-semibold text-blue-700 mb-2">
+        {editTrip ? "Editar viaje" : "Nuevo viaje"}
+      </h2>
       <input
         type="text"
         placeholder="Nombre del viaje"
@@ -43,7 +57,7 @@ function TripForm({ onAddTrip }) {
         type="submit"
         className="bg-blue-700 text-white rounded px-4 py-2 mt-2 hover:bg-blue-800"
       >
-        Crear viaje
+        {editTrip ? "Guardar cambios" : "Crear viaje"}
       </button>
     </form>
   );

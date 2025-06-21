@@ -4,6 +4,7 @@ import TripList from "../components/TripList";
 
 function Home() {
   const [trips, setTrips] = useState([]);
+  const [editTrip, setEditTrip] = useState(null);
 
   // Cargar viajes desde localStorage al iniciar
   useEffect(() => {
@@ -17,7 +18,27 @@ function Home() {
   }, [trips]);
 
   const handleAddTrip = (trip) => {
-    setTrips([...trips, { ...trip, id: Date.now() }]);
+    if (editTrip) {
+      // Editar viaje existente
+      const updatedTrips = trips.map((t) =>
+        t.id === editTrip.id ? { ...trip, id: editTrip.id, activities: t.activities || [] } : t
+      );
+      setTrips(updatedTrips);
+      setEditTrip(null);
+    } else {
+      // Nuevo viaje
+      setTrips([...trips, { ...trip, id: Date.now(), activities: [] }]);
+    }
+  };
+
+  const handleDeleteTrip = (id) => {
+    if (window.confirm("¿Seguro que quieres eliminar este viaje?")) {
+      setTrips(trips.filter((t) => t.id !== id));
+    }
+  };
+
+  const handleEditTrip = (trip) => {
+    setEditTrip(trip);
   };
 
   return (
@@ -26,8 +47,8 @@ function Home() {
         <h2 className="text-2xl font-semibold text-blue-800">Bienvenido a TripMate</h2>
         <p className="mt-2 text-blue-900">¡Comienza creando tu primer viaje!</p>
       </div>
-      <TripForm onAddTrip={handleAddTrip} />
-      <TripList trips={trips} />
+      <TripForm onAddTrip={handleAddTrip} editTrip={editTrip} />
+      <TripList trips={trips} onDelete={handleDeleteTrip} onEdit={handleEditTrip} />
     </div>
   );
 }
