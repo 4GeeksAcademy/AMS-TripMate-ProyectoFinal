@@ -1,18 +1,23 @@
 import { useState, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 import { TripContext } from "../context/TripContext";
-import { saveTrips } from "../utils/storage";
 import { FaMapMarkerAlt, FaCalendarAlt } from "react-icons/fa";
 
+// URL pública de tu backend Flask en Codespaces
+const API_URL = "https://studious-doodle-pjp55p7gpvj9365q7-5000.app.github.dev";
+
 const TripForm = () => {
+  const { token } = useContext(AuthContext);
   const { trips, setTrips } = useContext(TripContext);
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [budget, setBudget] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
@@ -24,22 +29,39 @@ const TripForm = () => {
       setError("La fecha de fin no puede ser anterior a la de inicio.");
       return;
     }
-    const newTrip = {
-      id: Date.now(),
-      title,
-      location,
-      startDate,
-      endDate,
-      activities: [],
-    };
-    const updatedTrips = [...trips, newTrip];
-    setTrips(updatedTrips);
-    saveTrips(updatedTrips);
-    setTitle("");
-    setLocation("");
-    setStartDate("");
-    setEndDate("");
-    setSuccess("¡Viaje creado con éxito!");
+    try {
+      const res = await fetch(`${API_URL}/api/trips`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          title,
+          city: location,
+          startDate,
+          endDate,
+          budget: budget ? Number(budget) : undefined,
+          activities: [],
+        }),
+      });
+      if (res.ok) {
+        const trip = await res.json();
+        setSuccess("¡Viaje creado con éxito!");
+        setTitle("");
+        setLocation("");
+        setStartDate("");
+        setEndDate("");
+        setBudget("");
+        // Opcional: recargar la lista de viajes desde el backend
+        // O simplemente añade el nuevo viaje a trips si tu backend lo devuelve
+        setTrips([...trips, trip]);
+      } else {
+        setError("No se pudo crear el viaje. Intenta de nuevo.");
+      }
+    } catch (err) {
+      setError("No se pudo conectar con el servidor.");
+    }
   };
 
   return (
@@ -102,6 +124,17 @@ const TripForm = () => {
             required
           />
         </div>
+      </div>
+      <div className="mb-4">
+        <input
+          type="number"
+          min="0"
+          step="1"
+          placeholder="Presupuesto (€) (opcional)"
+          className="border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded p-2 w-full transition"
+          value={budget}
+          onChange={(e) => setBudget(e.target.value)}
+        />
       </div>
       <button
         className="w-full bg-blue-600 hover:bg-blue-700 transition text-white px-4 py-2 rounded shadow font-semibold"

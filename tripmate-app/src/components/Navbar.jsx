@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AuthContext } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 import { FaSuitcaseRolling, FaBars, FaTimes } from "react-icons/fa";
 
 const Navbar = () => {
+  const { user } = useContext(AuthContext);
   const [open, setOpen] = useState(false);
 
   return (
@@ -31,6 +33,12 @@ const Navbar = () => {
             <Link to="/contacts" className="hover:text-yellow-400 transition font-semibold">
               Contacts
             </Link>
+            {/* Solo mostrar "Tus viajes" si está logueado */}
+            {user && (
+              <Link to="/profile" className="hover:text-yellow-400 transition font-semibold">
+                Tus viajes
+              </Link>
+            )}
           </div>
           {/* Botones a la derecha */}
           <div className="hidden md:flex gap-3 items-center ml-8">
@@ -40,12 +48,21 @@ const Navbar = () => {
             >
               Get Started
             </Link>
-            <Link
-              to="/login"
-              className="border border-yellow-400 hover:bg-yellow-400 hover:text-gray-950 text-yellow-400 font-bold px-4 py-2 rounded-lg shadow transition"
-            >
-              Iniciar sesión
-            </Link>
+            {!user ? (
+              <Link
+                to="/login"
+                className="border border-yellow-400 hover:bg-yellow-400 hover:text-gray-950 text-yellow-400 font-bold px-4 py-2 rounded-lg shadow transition"
+              >
+                Iniciar sesión
+              </Link>
+            ) : (
+              <Link
+                to="/logout"
+                className="border border-red-600 hover:bg-red-600 hover:text-white text-red-600 font-bold px-4 py-2 rounded-lg shadow transition"
+              >
+                Cerrar sesión
+              </Link>
+            )}
           </div>
           {/* Mobile menu button */}
           <button
@@ -73,6 +90,16 @@ const Navbar = () => {
           <Link to="/contacts" className="block py-2 hover:text-yellow-400 font-semibold" onClick={() => setOpen(false)}>
             Contacts
           </Link>
+          {/* Solo mostrar "Tus viajes" si está logueado */}
+          {user && (
+            <Link
+              to="/profile"
+              className="block py-2 hover:text-yellow-400 font-semibold"
+              onClick={() => setOpen(false)}
+            >
+              Tus viajes
+            </Link>
+          )}
           <Link
             to="/create-trip"
             className="block mt-4 bg-yellow-400 hover:bg-yellow-500 text-gray-950 font-bold px-4 py-2 rounded-lg shadow transition"
@@ -80,13 +107,23 @@ const Navbar = () => {
           >
             Get Started
           </Link>
-          <Link
-            to="/login"
-            className="block mt-2 border border-yellow-400 hover:bg-yellow-400 hover:text-gray-950 text-yellow-400 font-bold px-4 py-2 rounded-lg shadow transition"
-            onClick={() => setOpen(false)}
-          >
-            Iniciar sesión
-          </Link>
+          {!user ? (
+            <Link
+              to="/login"
+              className="block mt-2 border border-yellow-400 hover:bg-yellow-400 hover:text-gray-950 text-yellow-400 font-bold px-4 py-2 rounded-lg shadow transition"
+              onClick={() => setOpen(false)}
+            >
+              Iniciar sesión
+            </Link>
+          ) : (
+            <Link
+              to="/logout"
+              className="block mt-2 border border-red-600 hover:bg-red-600 hover:text-white text-red-600 font-bold px-4 py-2 rounded-lg shadow transition"
+              onClick={() => setOpen(false)}
+            >
+              Cerrar sesión
+            </Link>
+          )}
         </div>
       )}
     </nav>
