@@ -1,66 +1,116 @@
-import React, { useState, useEffect } from "react";
+import { useState, useContext } from "react";
+import { TripContext } from "../context/TripContext";
+import { saveTrips } from "../utils/storage";
+import { FaMapMarkerAlt, FaCalendarAlt } from "react-icons/fa";
 
-function TripForm({ onAddTrip, editTrip }) {
+const TripForm = () => {
+  const { trips, setTrips } = useContext(TripContext);
   const [title, setTitle] = useState("");
+  const [location, setLocation] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-
-  useEffect(() => {
-    if (editTrip) {
-      setTitle(editTrip.title || "");
-      setStartDate(editTrip.startDate || "");
-      setEndDate(editTrip.endDate || "");
-    } else {
-      setTitle("");
-      setStartDate("");
-      setEndDate("");
-    }
-  }, [editTrip]);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!title || !startDate || !endDate) return;
-    onAddTrip({ title, startDate, endDate });
+    setError("");
+    setSuccess("");
+    if (!title || !location || !startDate || !endDate) {
+      setError("Todos los campos son obligatorios.");
+      return;
+    }
+    if (endDate < startDate) {
+      setError("La fecha de fin no puede ser anterior a la de inicio.");
+      return;
+    }
+    const newTrip = {
+      id: Date.now(),
+      title,
+      location,
+      startDate,
+      endDate,
+      activities: [],
+    };
+    const updatedTrips = [...trips, newTrip];
+    setTrips(updatedTrips);
+    saveTrips(updatedTrips);
     setTitle("");
+    setLocation("");
     setStartDate("");
     setEndDate("");
+    setSuccess("¡Viaje creado con éxito!");
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white rounded shadow p-4 flex flex-col gap-2 w-full max-w-md"
+      className="bg-gradient-to-r from-blue-50 via-white to-blue-100 rounded-2xl shadow p-6 mb-8 border border-blue-100"
     >
-      <h2 className="text-xl font-semibold text-blue-700 mb-2">
-        {editTrip ? "Editar viaje" : "Nuevo viaje"}
+      <h2 className="text-xl font-bold text-blue-800 mb-4 text-center">
+        Crear nuevo viaje
       </h2>
-      <input
-        type="text"
-        placeholder="Nombre del viaje"
-        className="border rounded px-2 py-1"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-      <input
-        type="date"
-        className="border rounded px-2 py-1"
-        value={startDate}
-        onChange={(e) => setStartDate(e.target.value)}
-      />
-      <input
-        type="date"
-        className="border rounded px-2 py-1"
-        value={endDate}
-        onChange={(e) => setEndDate(e.target.value)}
-      />
+      {error && (
+        <div className="bg-red-100 text-red-700 px-3 py-2 rounded mb-2 text-center">
+          {error}
+        </div>
+      )}
+      {success && (
+        <div className="bg-green-100 text-green-700 px-3 py-2 rounded mb-2 text-center">
+          {success}
+        </div>
+      )}
+      <div className="flex flex-col md:flex-row gap-2 mb-2">
+        <input
+          className="border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded p-2 w-full transition"
+          type="text"
+          placeholder="Nombre del viaje"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          required
+        />
+        <div className="relative w-full">
+          <FaMapMarkerAlt className="absolute left-3 top-3 text-blue-400" />
+          <input
+            className="pl-10 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded p-2 w-full transition"
+            type="text"
+            placeholder="Ciudad o país"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            required
+          />
+        </div>
+      </div>
+      <div className="flex flex-col md:flex-row gap-2 mb-4">
+        <div className="relative w-full">
+          <FaCalendarAlt className="absolute left-3 top-3 text-blue-400" />
+          <input
+            className="pl-10 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded p-2 w-full transition"
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            required
+          />
+        </div>
+        <div className="relative w-full">
+          <FaCalendarAlt className="absolute left-3 top-3 text-blue-400" />
+          <input
+            className="pl-10 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded p-2 w-full transition"
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            required
+          />
+        </div>
+      </div>
       <button
+        className="w-full bg-blue-600 hover:bg-blue-700 transition text-white px-4 py-2 rounded shadow font-semibold"
         type="submit"
-        className="bg-blue-700 text-white rounded px-4 py-2 mt-2 hover:bg-blue-800"
       >
-        {editTrip ? "Guardar cambios" : "Crear viaje"}
+        Crear viaje
       </button>
     </form>
   );
-}
+};
 
 export default TripForm;

@@ -1,56 +1,23 @@
-import React, { useState, useEffect } from "react";
 import TripForm from "../components/TripForm";
 import TripList from "../components/TripList";
+import { FaSuitcaseRolling } from "react-icons/fa";
 
-function Home() {
-  const [trips, setTrips] = useState([]);
-  const [editTrip, setEditTrip] = useState(null);
-
-  // Cargar viajes desde localStorage al iniciar
-  useEffect(() => {
-    const stored = localStorage.getItem("trips");
-    if (stored) setTrips(JSON.parse(stored));
-  }, []);
-
-  // Guardar viajes en localStorage cuando cambian
-  useEffect(() => {
-    localStorage.setItem("trips", JSON.stringify(trips));
-  }, [trips]);
-
-  const handleAddTrip = (trip) => {
-    if (editTrip) {
-      // Editar viaje existente
-      const updatedTrips = trips.map((t) =>
-        t.id === editTrip.id ? { ...trip, id: editTrip.id, activities: t.activities || [] } : t
-      );
-      setTrips(updatedTrips);
-      setEditTrip(null);
-    } else {
-      // Nuevo viaje
-      setTrips([...trips, { ...trip, id: Date.now(), activities: [] }]);
-    }
-  };
-
-  const handleDeleteTrip = (id) => {
-    if (window.confirm("¿Seguro que quieres eliminar este viaje?")) {
-      setTrips(trips.filter((t) => t.id !== id));
-    }
-  };
-
-  const handleEditTrip = (trip) => {
-    setEditTrip(trip);
-  };
-
-  return (
-    <div className="w-full flex flex-col items-center">
-      <div className="text-center mt-8">
-        <h2 className="text-2xl font-semibold text-blue-800">Bienvenido a TripMate</h2>
-        <p className="mt-2 text-blue-900">¡Comienza creando tu primer viaje!</p>
+const Home = () => (
+  <div className="max-w-2xl mx-auto p-4">
+    <div className="bg-gradient-to-r from-blue-100 via-white to-blue-50 rounded-2xl shadow-lg p-8 mb-8 border border-blue-100 flex flex-col items-center">
+      <FaSuitcaseRolling className="text-blue-500 text-5xl mb-4" />
+      <h1 className="text-3xl font-extrabold text-blue-900 mb-2 text-center">¡Bienvenido a TripMate!</h1>
+      <p className="text-blue-700 text-center mb-6">
+        Organiza tus viajes, crea itinerarios diarios y comparte tus aventuras.
+      </p>
+      <div className="w-full">
+        <TripForm />
       </div>
-      <TripForm onAddTrip={handleAddTrip} editTrip={editTrip} />
-      <TripList trips={trips} onDelete={handleDeleteTrip} onEdit={handleEditTrip} />
     </div>
-  );
-}
+    <div className="bg-white rounded-2xl shadow-lg p-6 border border-blue-100">
+      <TripList />
+    </div>
+  </div>
+);
 
 export default Home;

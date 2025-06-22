@@ -5,6 +5,7 @@
   text-align: center;
 }
 
+/* Logo animado (opcional, solo si usas el logo de React o personalizado) */
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -26,17 +27,24 @@
     transform: rotate(360deg);
   }
 }
-
 @media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
+  .logo.spin {
     animation: logo-spin infinite 20s linear;
   }
 }
 
+/* Tarjeta personalizada (opcional, usa Tailwind preferentemente) */
 .card {
   padding: 2em;
+  border-radius: 1rem;
+  box-shadow: 0 2px 16px 0 #0001;
+  background: #fff;
 }
 
+/* Texto auxiliar (opcional) */
 .read-the-docs {
   color: #888;
+  font-size: 0.95em;
 }
+
+/* Elimina estilos globales innecesarios, usa Tailwind para layout y tipografía */

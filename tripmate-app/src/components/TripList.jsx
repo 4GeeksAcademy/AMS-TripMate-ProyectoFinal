@@ -1,48 +1,67 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import { useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { TripContext } from "../context/TripContext";
+import { saveTrips } from "../utils/storage";
+import { FaMapMarkerAlt, FaCalendarAlt, FaTrashAlt } from "react-icons/fa";
 
-function TripList({ trips, onDelete, onEdit }) {
-  if (trips.length === 0) {
-    return <p className="text-blue-900 mt-4">No hay viajes creados aún.</p>;
+const TripList = () => {
+  const { trips, setTrips } = useContext(TripContext);
+  const navigate = useNavigate();
+
+  const handleDeleteTrip = (tripId) => {
+    if (window.confirm("¿Seguro que quieres borrar este viaje?")) {
+      const updatedTrips = trips.filter(t => t.id !== tripId);
+      setTrips(updatedTrips);
+      saveTrips(updatedTrips);
+      navigate("/");
+    }
+  };
+
+  if (!trips.length) {
+    return (
+      <p className="bg-yellow-50 text-yellow-700 px-3 py-2 rounded shadow mb-4 text-center">
+        No hay viajes creados.
+      </p>
+    );
   }
 
   return (
-    <ul className="w-full max-w-md mt-4">
-      {trips.map((trip) => (
-        <li
-          key={trip.id}
-          className="bg-white rounded shadow p-3 mb-2 flex justify-between items-center"
-        >
-          <div>
-            <h3 className="font-bold text-blue-700">{trip.title}</h3>
-            <p className="text-sm text-blue-900">
-              {trip.startDate} - {trip.endDate}
-            </p>
-          </div>
-          <div className="flex gap-2">
+    <div>
+      <h2 className="text-2xl font-bold text-blue-900 mb-4 text-center">Tus viajes</h2>
+      <ul className="flex flex-col gap-4">
+        {trips.map(trip => (
+          <li
+            key={trip.id}
+            className="flex flex-col sm:flex-row sm:items-center justify-between bg-blue-50 rounded-xl shadow p-4 border-l-8 border-blue-400 transition hover:shadow-lg"
+          >
             <Link
-              to={`/viajes/${trip.id}`}
-              className="text-blue-600 hover:underline text-sm"
+              to={`/trip/${trip.id}`}
+              className="flex-1 flex flex-col sm:flex-row sm:items-center gap-2 text-blue-800 hover:underline font-semibold"
             >
-              Ver
+              <span className="flex items-center gap-1">
+                <FaMapMarkerAlt className="text-blue-400" />
+                {trip.location}
+              </span>
+              <span className="hidden sm:inline">|</span>
+              <span className="flex items-center gap-1">
+                <FaCalendarAlt className="text-blue-400" />
+                {trip.startDate} - {trip.endDate}
+              </span>
+              <span className="hidden sm:inline">|</span>
+              <span className="font-bold">{trip.title}</span>
             </Link>
             <button
-              className="text-yellow-600 hover:underline text-sm"
-              onClick={() => onEdit(trip)}
+              className="flex items-center gap-1 bg-red-600 hover:bg-red-700 transition text-white px-3 py-1 rounded shadow mt-3 sm:mt-0 sm:ml-4"
+              onClick={() => handleDeleteTrip(trip.id)}
             >
-              Editar
+              <FaTrashAlt />
+              Borrar
             </button>
-            <button
-              className="text-red-600 hover:underline text-sm"
-              onClick={() => onDelete(trip.id)}
-            >
-              Eliminar
-            </button>
-          </div>
-        </li>
-      ))}
-    </ul>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
-}
+};
 
 export default TripList;
