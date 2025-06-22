@@ -1,4 +1,8 @@
-/* @tailwind directives removed or ensure Tailwind CSS is processing this file */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ...tu CSS personalizado debajo... */
 
 /* Fuente base y suavizado */
 :root {
